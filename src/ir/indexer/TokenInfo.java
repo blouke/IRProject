@@ -12,6 +12,15 @@ public class TokenInfo {
 		this.occMap = new HashMap<Integer,TokenOccurrence>();
 	}
 	
+	public void calculateIdf(int totalDoc){
+		idf = Math.log(occMap.size())/Math.log(totalDoc);
+		System.out.println("Document frequency: "+occMap.size());		//remove this line
+	}
+	
+	public double getIdf(){
+		return idf;
+	}
+	
 	public void addTokenOccurrence(int docId, int count){
 		if (occMap.containsKey(docId)){
 			TokenOccurrence tokenOccc = occMap.get(docId);

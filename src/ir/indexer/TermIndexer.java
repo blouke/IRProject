@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -40,7 +41,8 @@ public class TermIndexer {
 				tokenString = token.toString().split("\\R",4);
 				url = tokenString[0];
 				content = tokenString[3];
-				System.out.println(url);	// remove this line
+				content = content.trim();
+//				System.out.println(url);	// remove this line
 				if (content.length()>0){
 					docInfoList.add(new DocInfo(docId,url));
 					createIndex(content, docId);
@@ -49,6 +51,19 @@ public class TermIndexer {
 			}
 			tokenStream.end();
 			tokenStream.close();
+			
+			// calculating IDF
+			for (Map.Entry<String, TokenInfo> entry: dictionary.entrySet()){
+				String key = entry.getKey();
+				TokenInfo tokenInfo = entry.getValue();
+				tokenInfo.calculateIdf(docId);
+				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());
+			}
+			
+//			for (TokenInfo tokenInfo: dictionary.values()){
+//		    	tokenInfo.calculateIdf(docId); 
+//		    	System.out.println("IDF :"+tokenInfo.getIdf()); 		//remove this line
+//		    }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +88,7 @@ public class TermIndexer {
 					newTokenInfo.addTokenOccurrence(docId,1);
 					dictionary.put(term, newTokenInfo);
 				}
-				System.out.println(token.toString());	//remove this line
+//				System.out.println(token.toString());	//remove this line
 			}
 			tokenStream.end();
 			tokenStream.close();
