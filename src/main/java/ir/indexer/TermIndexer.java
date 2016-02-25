@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -23,8 +21,8 @@ import ir.indexer.TokenInfo;
 
 public class TermIndexer {
 	
-	private static List<DocInfo> docInfoList = new ArrayList<DocInfo>();
-	private static HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
+	public static HashMap<Integer,DocInfo> docInfoList = new HashMap<Integer,DocInfo>();
+	public static HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
 	private static int docId=0;
 	private InputStream inputStream;
 	
@@ -47,7 +45,7 @@ public class TermIndexer {
 				content = tokenString[3];
 				content = content.trim();
 				if (content.length()>0){
-					docInfoList.add(new DocInfo(docId,url));
+					docInfoList.put(docId, new DocInfo(docId,url));
 					createIndex(content, docId);
 					docId+=1;
 				}
@@ -89,6 +87,24 @@ public class TermIndexer {
 			}
 			tokenStream.end();
 			tokenStream.close();
+			
+			
+			// calculate document length
+			
+			for (Map.Entry<String, TokenInfo> dictionaryEntry: dictionary.entrySet()){
+				double idf = dictionaryEntry.getValue().getIdf();
+				for (Map.Entry<Integer, TokenOccurrence> tokenOccEntry: dictionaryEntry.getValue().getOccMap().entrySet()){
+					int tokenCount =tokenOccEntry.getValue().getCount();
+					DocInfo docInfo = docInfoList.get(tokenOccEntry.getKey());
+					docInfo.setLength(docInfo.getLength()+Math.pow(tokenCount*idf, 2));
+				}
+			}
+			
+			for (Map.Entry<Integer, DocInfo> doc: docInfoList.entrySet()){
+				double newLength = Math.sqrt(doc.getValue().getLength());
+				doc.getValue().setLength(newLength);
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

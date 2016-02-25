@@ -29,4 +29,8 @@ public class TokenInfo {
 			occMap.put(docId, new TokenOccurrence(docId,count));
 		}
 	}
+	
+	public HashMap<Integer,TokenOccurrence> getOccMap(){
+		return occMap;
+	}
 }

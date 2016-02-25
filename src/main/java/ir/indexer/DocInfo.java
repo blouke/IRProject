@@ -12,4 +12,11 @@ public class DocInfo {
 		length = 0.0;
 	}
 	
+	public void setLength(double length){
+		this.length = length;
+	}
+	
+	public double getLength(){
+		return length;
+	}
 }

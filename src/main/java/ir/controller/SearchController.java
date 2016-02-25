@@ -45,7 +45,7 @@ public class SearchController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
-		ArrayList<Document> searchResults = new QueryProcessor(index).generateResults(request.getParameter("query"));
+		ArrayList<Document> searchResults = new QueryProcessor(index).processQuery(request.getParameter("query"));
 		request.setAttribute("results", searchResults);
 		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/result.jsp");
 		dispatcher.include(request, response);
