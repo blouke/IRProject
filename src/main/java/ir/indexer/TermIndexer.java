@@ -1,8 +1,7 @@
 package ir.indexer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -27,11 +26,16 @@ public class TermIndexer {
 	private static List<DocInfo> docInfoList = new ArrayList<DocInfo>();
 	private static HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
 	private static int docId=0;
+	private InputStream inputStream;
 	
-	public static void main(String[] args) {
+	public TermIndexer(InputStream inputStream){
+		this.inputStream = inputStream;
+	}
+	
+	public void initialize() {
 		try {
 			PatternTokenizer tokenStream = new PatternTokenizer(Pattern.compile("(?s)(?<=URL::\\s).*?(?=Recno::)"),0);
-			tokenStream.setReader(new InputStreamReader(new FileInputStream(new File("resources/dump"))));
+			tokenStream.setReader(new InputStreamReader(inputStream));
 			tokenStream.reset();
 			CharTermAttribute token = tokenStream.addAttribute(CharTermAttribute.class);
 			String[] tokenString;
@@ -42,7 +46,6 @@ public class TermIndexer {
 				url = tokenString[0];
 				content = tokenString[3];
 				content = content.trim();
-//				System.out.println(url);	// remove this line
 				if (content.length()>0){
 					docInfoList.add(new DocInfo(docId,url));
 					createIndex(content, docId);
@@ -59,18 +62,13 @@ public class TermIndexer {
 				tokenInfo.calculateIdf(docId);
 				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());
 			}
-			
-//			for (TokenInfo tokenInfo: dictionary.values()){
-//		    	tokenInfo.calculateIdf(docId); 
-//		    	System.out.println("IDF :"+tokenInfo.getIdf()); 		//remove this line
-//		    }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 
-	public static void createIndex(String content, int docId){
+	public void createIndex(String content, int docId){
 		try {
 			StandardTokenizer stream = new StandardTokenizer();
 			stream.setReader(new StringReader(content));
@@ -88,7 +86,6 @@ public class TermIndexer {
 					newTokenInfo.addTokenOccurrence(docId,1);
 					dictionary.put(term, newTokenInfo);
 				}
-//				System.out.println(token.toString());	//remove this line
 			}
 			tokenStream.end();
 			tokenStream.close();
