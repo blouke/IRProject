@@ -3,7 +3,9 @@ package ir.query;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -20,10 +22,11 @@ import ir.indexer.TokenOccurrence;
 
 public class QueryProcessor {
 	private TermIndexer index;
-	private HashMap<String,Double> queryIndex=null;
+	private HashMap<String,Double> queryIndex;
 
 	public QueryProcessor(TermIndexer index){
 		this.index = index;
+		queryIndex = new HashMap<String,Double>();
 	}
 
 
@@ -86,14 +89,18 @@ public ArrayList<Document> generateResults(){
 	
 
 	// calculate similarity score
+	ArrayList<Document> result = new ArrayList<Document>();
 	for (Map.Entry<DocInfo, Double> entry: searchResult.entrySet()){
 		DocInfo docInfo = entry.getKey();
-		double dotProduct = 0d;
+		double dotProduct = 5d;
 		double norm = docInfo.getLength()*queryVectorLength;
-		
+		double score = dotProduct/norm;
+		String snippet = "description";
+		result.add(new Document(score,docInfo.getUrl(),snippet));
 	}
 	
-	
-	return null;
+	// sort the result list
+	Collections.sort(result);
+	return result;
 }
 }

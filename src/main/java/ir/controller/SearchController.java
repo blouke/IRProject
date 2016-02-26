@@ -18,7 +18,7 @@ import ir.query.QueryProcessor;
 /**
  * Servlet implementation class SearchController
  */
-@WebServlet("/irproject/search")
+//@WebServlet("/search")
 public class SearchController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private static TermIndexer index;

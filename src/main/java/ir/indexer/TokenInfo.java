@@ -14,7 +14,7 @@ public class TokenInfo {
 	
 	public void calculateIdf(int totalDoc){
 		idf = Math.log(totalDoc/occMap.size())/Math.log(totalDoc);
-		System.out.println("Document frequency: "+occMap.size());		//remove this line
+//		System.out.println("Document frequency: "+occMap.size());		//remove this line
 	}
 	
 	public double getIdf(){

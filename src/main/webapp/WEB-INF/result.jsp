@@ -9,11 +9,10 @@
 <title>Insert title here</title>
 </head>
 <body>
-
-	<c:forEach var="document" items="${searchResults.toArray}">
-		<h4><a href="<c:url value="http://${document.url}" />">${document.name}</a></h4>
-		<c:out value="${document.snippet }"/>
+	<c:forEach var="document" items="${results}">
+		<h4><a href="<c:url value="http://${document.url}" />">${document.url}</a></h4>
+		<c:out value="${document.snippet}"/>
 	</c:forEach>
-
+	
 </body>
 </html>

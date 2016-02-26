@@ -19,4 +19,8 @@ public class DocInfo {
 	public double getLength(){
 		return length;
 	}
+	
+	public String getUrl(){
+		return url;
+	}
 }

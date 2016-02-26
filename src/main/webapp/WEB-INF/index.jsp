@@ -9,7 +9,7 @@
 </head>
 
 <body>
-
+<!-- ${pageContext.request.contextPath} -->
 	<h1>Search</h1>
 	<form action="${pageContext.request.contextPath}/search" method="post" id="searchbox">
 		

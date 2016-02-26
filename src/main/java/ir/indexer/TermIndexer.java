@@ -58,7 +58,7 @@ public class TermIndexer {
 				String key = entry.getKey();
 				TokenInfo tokenInfo = entry.getValue();
 				tokenInfo.calculateIdf(docId);
-				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());
+//				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());	`remove this line
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
