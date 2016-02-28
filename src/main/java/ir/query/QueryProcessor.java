@@ -42,65 +42,69 @@ public class QueryProcessor {
 				String term = token.toString();
 				queryIndex.put(term,1d);
 			}
-		tokenStream.end();
-		tokenStream.close();
+			tokenStream.end();
+			tokenStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return generateResults();
-}
+	}
 
-	
-public ArrayList<Document> generateResults(){
 
-	HashMap<DocInfo, Double> searchResult = new HashMap<DocInfo,Double>();
-	double queryVectorLength = 0d;
-	
-//	System.out.println(queryIndex.keySet());
+	public ArrayList<Document> generateResults(){
 
-	for (Map.Entry<String, Double> dictionaryEntry: queryIndex.entrySet()){
-		String token = dictionaryEntry.getKey();
-	
-		if (index.dictionary.containsKey(token)){
-			TokenInfo tokenInfo = index.dictionary.get(token);
-			
-			for (Map.Entry<Integer, TokenOccurrence> tokenOccEntry: tokenInfo.getOccMap().entrySet()){
-				int docId = tokenOccEntry.getKey();
-				int tokenCount = tokenOccEntry.getValue().getCount();
-				double idf = tokenInfo.getIdf();
-				DocInfo docInfo = index.docInfoList.get(docId);
-				
-				if (searchResult.containsKey(docInfo)){
-					double score = searchResult.get(docInfo);
-					double newScore = score*tokenCount*idf;
-					searchResult.put(docInfo, newScore);
-				} else {
-					searchResult.put(docInfo, tokenCount*idf);
+		HashMap<DocInfo, Double> searchResult = new HashMap<DocInfo,Double>();
+		double queryVectorLength = 0d;
+
+		//	System.out.println(queryIndex.keySet());
+
+		for (Map.Entry<String, Double> dictionaryEntry: queryIndex.entrySet()){
+			String token = dictionaryEntry.getKey();
+
+			if (index.dictionary.containsKey(token)){
+				TokenInfo tokenInfo = index.dictionary.get(token);
+				queryIndex.put(token, 1*tokenInfo.getIdf());
+
+				for (Map.Entry<Integer, TokenOccurrence> tokenOccEntry: tokenInfo.getOccMap().entrySet()){
+					int docId = tokenOccEntry.getKey();
+					int tokenCount = tokenOccEntry.getValue().getCount();
+					double idf = tokenInfo.getIdf();
+					DocInfo docInfo = index.docInfoList.get(docId);
+
+					if (searchResult.containsKey(docInfo)){
+						double score = searchResult.get(docInfo);
+						double newScore = score + (queryIndex.get(token)*(tokenCount*idf));
+//						double newScore = score*tokenCount*idf;
+						searchResult.put(docInfo, newScore);
+					} else {
+//						searchResult.put(docInfo, tokenCount*idf);
+						searchResult.put(docInfo, queryIndex.get(token)*tokenCount*idf);
+					}
 				}
 			}
 		}
-	}
-	
-	// calculate the lenght of query vector
-	for (Double l: queryIndex.values()){
-		queryVectorLength += Math.pow(l, 2);
-	}
-	queryVectorLength = Math.sqrt(queryVectorLength);
-	
 
-	// calculate similarity score
-	ArrayList<Document> result = new ArrayList<Document>();
-	for (Map.Entry<DocInfo, Double> entry: searchResult.entrySet()){
-		DocInfo docInfo = entry.getKey();
-		double dotProduct = 5d;
-		double norm = docInfo.getLength()*queryVectorLength;
-		double score = dotProduct/norm;
-		String snippet = "description";
-		result.add(new Document(score,docInfo.getUrl(),snippet));
+		// calculate the lenght of query vector
+		for (Double l: queryIndex.values()){
+			queryVectorLength += Math.pow(l, 2);
+		}
+		queryVectorLength = Math.sqrt(queryVectorLength);
+
+		// calculate similarity score
+		ArrayList<Document> result = new ArrayList<Document>();
+		for (Map.Entry<DocInfo, Double> entry: searchResult.entrySet()){
+			DocInfo docInfo = entry.getKey();
+			double dotProduct = entry.getValue();
+			double denominator = docInfo.getLength()*queryVectorLength;
+			System.out.println("dotProduct :"+ dotProduct + "denominator :" + denominator);
+			double score = dotProduct/denominator;
+			System.out.println(score);
+			String snippet = "description";
+			result.add(new Document(score,docInfo.getUrl(),snippet));
+		}
+
+		// sort the result list
+		Collections.sort(result);
+		return result;
 	}
-	
-	// sort the result list
-	Collections.sort(result);
-	return result;
-}
 }

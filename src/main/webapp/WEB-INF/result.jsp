@@ -11,6 +11,7 @@
 <body>
 	<c:forEach var="document" items="${results}">
 		<h4><a href="<c:url value="http://${document.url}" />">${document.url}</a></h4>
+		<h4>Score :<c:out value="${document.score}"/></h4>
 		<c:out value="${document.snippet}"/>
 	</c:forEach>
 	

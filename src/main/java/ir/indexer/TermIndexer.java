@@ -20,16 +20,16 @@ import ir.indexer.DocInfo;
 import ir.indexer.TokenInfo;
 
 public class TermIndexer {
-	
+
 	public static HashMap<Integer,DocInfo> docInfoList = new HashMap<Integer,DocInfo>();
 	public static HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
 	private static int docId=0;
 	private InputStream inputStream;
-	
+
 	public TermIndexer(InputStream inputStream){
 		this.inputStream = inputStream;
 	}
-	
+
 	public void initialize() {
 		try {
 			PatternTokenizer tokenStream = new PatternTokenizer(Pattern.compile("(?s)(?<=URL::\\s).*?(?=Recno::)"),0);
@@ -52,13 +52,32 @@ public class TermIndexer {
 			}
 			tokenStream.end();
 			tokenStream.close();
-			
+
 			// calculating IDF
 			for (Map.Entry<String, TokenInfo> entry: dictionary.entrySet()){
 				String key = entry.getKey();
 				TokenInfo tokenInfo = entry.getValue();
 				tokenInfo.calculateIdf(docId);
-//				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());	`remove this line
+//				System.out.println("Term :"+key+"\tIDF :"+tokenInfo.getIdf());	//remove this line
+			}
+
+
+			// calculate document length
+
+			for (Map.Entry<String, TokenInfo> dictionaryEntry: dictionary.entrySet()){
+				double idf = dictionaryEntry.getValue().getIdf();
+//				System.out.println("idf   "+idf);
+				for (Map.Entry<Integer, TokenOccurrence> tokenOccEntry: dictionaryEntry.getValue().getOccMap().entrySet()){
+					int tokenCount =tokenOccEntry.getValue().getCount();
+					DocInfo docInfo = docInfoList.get(tokenOccEntry.getKey());
+					double length = docInfo.getLength()+Math.pow(tokenCount*idf, 2);
+					docInfo.setLength(length);
+				}
+			}
+
+			for (Map.Entry<Integer, DocInfo> doc: docInfoList.entrySet()){
+				double newLength = Math.sqrt(doc.getValue().getLength());
+				doc.getValue().setLength(newLength);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -87,24 +106,6 @@ public class TermIndexer {
 			}
 			tokenStream.end();
 			tokenStream.close();
-			
-			
-			// calculate document length
-			
-			for (Map.Entry<String, TokenInfo> dictionaryEntry: dictionary.entrySet()){
-				double idf = dictionaryEntry.getValue().getIdf();
-				for (Map.Entry<Integer, TokenOccurrence> tokenOccEntry: dictionaryEntry.getValue().getOccMap().entrySet()){
-					int tokenCount =tokenOccEntry.getValue().getCount();
-					DocInfo docInfo = docInfoList.get(tokenOccEntry.getKey());
-					docInfo.setLength(docInfo.getLength()+Math.pow(tokenCount*idf, 2));
-				}
-			}
-			
-			for (Map.Entry<Integer, DocInfo> doc: docInfoList.entrySet()){
-				double newLength = Math.sqrt(doc.getValue().getLength());
-				doc.getValue().setLength(newLength);
-			}
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

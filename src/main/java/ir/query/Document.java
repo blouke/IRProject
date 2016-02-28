@@ -18,11 +18,15 @@ public class Document implements Comparable<Document>{
 	public String getSnippet() {
 		return snippet;
 	}
+	
+	public double getScore(){
+		return score;
+	}
 
 	@Override
 	public int compareTo(Document d) {
 		// TODO Auto-generated method stub
-		return (this.score<d.score)?-1:(this.score>d.score)?1:0;
+		return (this.score>d.score)?-1:(this.score<d.score)?1:0;
 	}
 	
 	
