@@ -47,7 +47,7 @@ public class SearchController extends HttpServlet {
 
 		ArrayList<Document> searchResults = new QueryProcessor(index).processQuery(request.getParameter("query"));
 		request.setAttribute("results", searchResults);
-		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/result.jsp");
+		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/result.jsp");
 		dispatcher.include(request, response);
 		
 		//		response.getWriter().append("Served at: ").append(request.getContextPath());

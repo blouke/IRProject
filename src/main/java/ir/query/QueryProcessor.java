@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -74,10 +73,8 @@ public class QueryProcessor {
 					if (searchResult.containsKey(docInfo)){
 						double score = searchResult.get(docInfo);
 						double newScore = score + (queryIndex.get(token)*(tokenCount*idf));
-//						double newScore = score*tokenCount*idf;
 						searchResult.put(docInfo, newScore);
 					} else {
-//						searchResult.put(docInfo, tokenCount*idf);
 						searchResult.put(docInfo, queryIndex.get(token)*tokenCount*idf);
 					}
 				}
@@ -96,9 +93,7 @@ public class QueryProcessor {
 			DocInfo docInfo = entry.getKey();
 			double dotProduct = entry.getValue();
 			double denominator = docInfo.getLength()*queryVectorLength;
-			System.out.println("dotProduct :"+ dotProduct + "denominator :" + denominator);
 			double score = dotProduct/denominator;
-			System.out.println(score);
 			String snippet = "description";
 			result.add(new Document(score,docInfo.getUrl(),snippet));
 		}
