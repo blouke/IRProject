@@ -1,11 +1,13 @@
 package ir.query;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopAnalyzer;
@@ -18,6 +20,16 @@ import ir.indexer.DocInfo;
 import ir.indexer.TermIndexer;
 import ir.indexer.TokenInfo;
 import ir.indexer.TokenOccurrence;
+import net.didion.jwnl.JWNL;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.data.IndexWord;
+import net.didion.jwnl.data.POS;
+import net.didion.jwnl.data.PointerUtils;
+import net.didion.jwnl.data.Synset;
+import net.didion.jwnl.data.Word;
+import net.didion.jwnl.data.list.PointerTargetNode;
+import net.didion.jwnl.data.list.PointerTargetNodeList;
+import net.didion.jwnl.dictionary.Dictionary;
 
 public class QueryProcessor {
 	private TermIndexer index;
@@ -31,19 +43,63 @@ public class QueryProcessor {
 
 	public ArrayList<Document> processQuery(String query){
 		try {
+			
+			String jwnlProp = System.getProperty("jwnlProp");
+			JWNL.initialize(new FileInputStream(jwnlProp));
+			final Dictionary wordnet = Dictionary.getInstance();
+
 			StandardTokenizer stream = new StandardTokenizer();
 			stream.setReader(new StringReader(query));
 			TokenStream tokenStream = new StopFilter(stream, StopAnalyzer.ENGLISH_STOP_WORDS_SET);
-			tokenStream = new PorterStemFilter(tokenStream);
 			tokenStream.reset();
 			CharTermAttribute token = tokenStream.addAttribute(CharTermAttribute.class);
+			StringBuilder str = new StringBuilder();
+			
 			while (tokenStream.incrementToken()){
 				String term = token.toString();
-				queryIndex.put(term,1d);
+				str.append(term+"\t");
+				IndexWord indexWord = wordnet.lookupIndexWord(POS.NOUN, term);
+				if (indexWord != null){
+					Synset[] senses = indexWord.getSenses();
+					for (Synset synset: senses){
+						Word[] words = synset.getWords(); 
+						for (Word word: words){
+							str.append(word.getLemma()+"\t");
+						}
+					
+//					PointerTargetNodeList relatedList = PointerUtils.getInstance().getSynonyms(synset);					
+//					Iterator i = relatedList.iterator();
+//					while (i.hasNext()){
+//						PointerTargetNode synonymNode = (PointerTargetNode)i.next();
+//						Synset synonym = synonymNode.getSynset();
+//						Word[] words = synonym.getWords();
+//						for (Word w: words){
+//							str.append(w.getLemma());
+//						}
+//					}
+				}
 			}
+		}
+			
 			tokenStream.end();
 			tokenStream.close();
+
+
+			stream.setReader(new StringReader(str.toString()));
+			TokenStream newTokenStream = new PorterStemFilter(tokenStream);
+			newTokenStream.reset();
+			CharTermAttribute newToken = newTokenStream.addAttribute(CharTermAttribute.class);
+			while (newTokenStream.incrementToken()){
+				String term = newToken.toString();
+				queryIndex.put(term,1d);
+			}
+			newTokenStream.end();
+			newTokenStream.close();
 		} catch (IOException e) {
+			e.printStackTrace();
+		
+		} catch (JWNLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return generateResults();

@@ -1,10 +1,15 @@
 package ir.controller;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,15 +26,15 @@ import ir.query.QueryProcessor;
 //@WebServlet("/search")
 public class SearchController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    private static TermIndexer index;
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public SearchController() {
-        super();
-        
-        // TODO Auto-generated constructor stub
-    }
+	private static TermIndexer index;
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public SearchController() {
+		super();
+
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -37,6 +42,21 @@ public class SearchController extends HttpServlet {
 		super.init(config);
 		index = new TermIndexer(config.getServletContext().getResourceAsStream("/WEB-INF/classes/dump"));
 		index.initialize();
+		ServletContext context = config.getServletContext();
+		String jwnlPropPath = context.getInitParameter("jwnl.properties");
+
+		try {
+			URL jwnlPropURL = context.getResource(jwnlPropPath);
+			String jwnlProp = Paths.get(jwnlPropURL.toURI()).toString();
+			System.setProperty("jwnlProp", jwnlProp);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -49,7 +69,7 @@ public class SearchController extends HttpServlet {
 		request.setAttribute("results", searchResults);
 		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/result.jsp");
 		dispatcher.include(request, response);
-		
+
 		//		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
