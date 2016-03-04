@@ -31,7 +31,7 @@ import ir.query.QueryProcessor;
 //@WebServlet("/search")
 public class SearchController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static TermIndexer index;
+	private TermIndexer index;
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -47,7 +47,7 @@ public class SearchController extends HttpServlet {
 		super.init(config);
 		ServletContext context = config.getServletContext();
 
-		InputStream fileIn = context.getResourceAsStream("/WEB-INF/classes/index");
+		InputStream fileIn = context.getResourceAsStream("/WEB-INF/classes/index.ser");
 		
 		if (fileIn!=null){
 			try {
@@ -70,7 +70,8 @@ public class SearchController extends HttpServlet {
 			// serialize index
 			FileOutputStream fileOut;
 			try {
-				fileOut = new FileOutputStream("/WEB-INF/classes/index");
+				String indexFilePath = context.getRealPath("/WEB-INF/classes/");
+				fileOut = new FileOutputStream(indexFilePath+"index.ser");
 				ObjectOutputStream out = new ObjectOutputStream(fileOut);
 				out.writeObject(index);
 				out.close();
@@ -80,7 +81,7 @@ public class SearchController extends HttpServlet {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
+		}
 
 			String jwnlPropPath = context.getInitParameter("jwnl.properties");
 			try {
@@ -92,7 +93,7 @@ public class SearchController extends HttpServlet {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-		}
+		
 	}
 
 	/**

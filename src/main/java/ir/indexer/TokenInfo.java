@@ -1,9 +1,11 @@
 package ir.indexer;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class TokenInfo {
+public class TokenInfo implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
 	private double idf;
 	private HashMap<Integer,TokenOccurrence> occMap;
 	

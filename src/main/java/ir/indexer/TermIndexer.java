@@ -3,6 +3,7 @@ package ir.indexer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +20,13 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import ir.indexer.DocInfo;
 import ir.indexer.TokenInfo;
 
-public class TermIndexer {
+public class TermIndexer implements Serializable{
 
-	public static HashMap<Integer,DocInfo> docInfoList = new HashMap<Integer,DocInfo>();
-	public static HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
-	private static int docId=0;
-	private InputStream inputStream;
+	private static final long serialVersionUID = 1L;
+	public HashMap<Integer,DocInfo> docInfoList = new HashMap<Integer,DocInfo>();
+	public HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
+	private int docId=0;
+	private transient InputStream inputStream;
 
 	public TermIndexer(InputStream inputStream){
 		this.inputStream = inputStream;

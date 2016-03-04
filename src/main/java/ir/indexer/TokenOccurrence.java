@@ -1,6 +1,10 @@
 package ir.indexer;
 
-public class TokenOccurrence {
+import java.io.Serializable;
+
+public class TokenOccurrence implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	private int docId;
 	private int count;
 	
