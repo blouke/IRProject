@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -48,7 +49,7 @@ public class SearchController extends HttpServlet {
 		ServletContext context = config.getServletContext();
 
 		InputStream fileIn = context.getResourceAsStream("/WEB-INF/classes/index.ser");
-		
+
 		if (fileIn!=null){
 			try {
 				ObjectInputStream in = new ObjectInputStream(fileIn);
@@ -61,8 +62,8 @@ public class SearchController extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-		
-		
+
+
 		else {
 			index = new TermIndexer(context.getResourceAsStream("/WEB-INF/classes/dump"));
 			index.initialize();
@@ -83,31 +84,40 @@ public class SearchController extends HttpServlet {
 			}
 		}
 
-			String jwnlPropPath = context.getInitParameter("jwnl.properties");
-			try {
-				URL jwnlPropURL = context.getResource(jwnlPropPath);
-				String jwnlProp = Paths.get(jwnlPropURL.toURI()).toString();
-				System.setProperty("jwnlProp", jwnlProp);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-		
+		String jwnlPropPath = context.getInitParameter("jwnl.properties");
+		try {
+			URL jwnlPropURL = context.getResource(jwnlPropPath);
+			String jwnlProp = Paths.get(jwnlPropURL.toURI()).toString();
+			System.setProperty("jwnlProp", jwnlProp);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 
-		ArrayList<Document> searchResults = new QueryProcessor(index).processQuery(request.getParameter("query"));
+		ArrayList<Document> searchResults = null;
+		Map<String, String[]> feedbackData = request.getParameterMap();
+		QueryProcessor queryProcessor = new QueryProcessor(index);
+		queryProcessor.processQuery(request.getParameter("query"));
+		
+		if (feedbackData.containsKey("relevanceHidden")){
+			String[] docIds = feedbackData.get("docId");
+			String[] relevance = feedbackData.get("relevanceHidden");
+			searchResults = queryProcessor.generateUpdatedResults(docIds, relevance);
+		}
+		else {
+			searchResults  = queryProcessor.generateResults();
+		}
 		request.setAttribute("results", searchResults);
 		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/result.jsp");
 		dispatcher.include(request, response);
-
-		//		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
@@ -119,3 +129,18 @@ public class SearchController extends HttpServlet {
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

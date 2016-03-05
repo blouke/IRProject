@@ -1,6 +1,7 @@
 package ir.query;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -34,19 +35,23 @@ import net.didion.jwnl.dictionary.Dictionary;
 public class QueryProcessor {
 	private TermIndexer index;
 	private HashMap<String,Double> queryIndex;
+	private Dictionary wordnet;
 
 	public QueryProcessor(TermIndexer index){
 		this.index = index;
 		queryIndex = new HashMap<String,Double>();
+		try {
+			JWNL.initialize(new FileInputStream(System.getProperty("jwnlProp")));
+			wordnet = Dictionary.getInstance();
+		} catch (FileNotFoundException | JWNLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
-	public ArrayList<Document> processQuery(String query){
+	public void processQuery(String query){
 		try {
-			
-			String jwnlProp = System.getProperty("jwnlProp");
-			JWNL.initialize(new FileInputStream(jwnlProp));
-			final Dictionary wordnet = Dictionary.getInstance();
 
 			StandardTokenizer stream = new StandardTokenizer();
 			stream.setReader(new StringReader(query));
@@ -84,7 +89,6 @@ public class QueryProcessor {
 			tokenStream.end();
 			tokenStream.close();
 
-
 			stream.setReader(new StringReader(str.toString()));
 			TokenStream newTokenStream = new PorterStemFilter(tokenStream);
 			newTokenStream.reset();
@@ -95,14 +99,10 @@ public class QueryProcessor {
 			}
 			newTokenStream.end();
 			newTokenStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		
-		} catch (JWNLException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException | JWNLException e) {
 			e.printStackTrace();
 		}
-		return generateResults();
+		
 	}
 
 
@@ -157,5 +157,9 @@ public class QueryProcessor {
 		// sort the result list
 		Collections.sort(result);
 		return result;
+	}
+	
+	public ArrayList<Document> generateUpdatedResults(String[] docIds, String[] relevance){
+		return null;
 	}
 }
