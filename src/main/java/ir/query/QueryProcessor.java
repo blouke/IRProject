@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import ir.indexer.DocInfo;
 import ir.indexer.TermIndexer;
+import ir.indexer.TermOccurrence;
 import ir.indexer.TokenInfo;
 import ir.indexer.TokenOccurrence;
 import net.didion.jwnl.JWNL;
@@ -59,7 +60,7 @@ public class QueryProcessor {
 			tokenStream.reset();
 			CharTermAttribute token = tokenStream.addAttribute(CharTermAttribute.class);
 			StringBuilder str = new StringBuilder();
-			
+
 			while (tokenStream.incrementToken()){
 				String term = token.toString();
 				str.append(term+"\t");
@@ -71,21 +72,21 @@ public class QueryProcessor {
 						for (Word word: words){
 							str.append(word.getLemma()+"\t");
 						}
-					
-//					PointerTargetNodeList relatedList = PointerUtils.getInstance().getSynonyms(synset);					
-//					Iterator i = relatedList.iterator();
-//					while (i.hasNext()){
-//						PointerTargetNode synonymNode = (PointerTargetNode)i.next();
-//						Synset synonym = synonymNode.getSynset();
-//						Word[] words = synonym.getWords();
-//						for (Word w: words){
-//							str.append(w.getLemma());
-//						}
-//					}
+
+						//					PointerTargetNodeList relatedList = PointerUtils.getInstance().getSynonyms(synset);					
+						//					Iterator i = relatedList.iterator();
+						//					while (i.hasNext()){
+						//						PointerTargetNode synonymNode = (PointerTargetNode)i.next();
+						//						Synset synonym = synonymNode.getSynset();
+						//						Word[] words = synonym.getWords();
+						//						for (Word w: words){
+						//							str.append(w.getLemma());
+						//						}
+						//					}
+					}
 				}
 			}
-		}
-			
+
 			tokenStream.end();
 			tokenStream.close();
 
@@ -102,7 +103,7 @@ public class QueryProcessor {
 		} catch (IOException | JWNLException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -147,19 +148,92 @@ public class QueryProcessor {
 		ArrayList<Document> result = new ArrayList<Document>();
 		for (Map.Entry<DocInfo, Double> entry: searchResult.entrySet()){
 			DocInfo docInfo = entry.getKey();
+			int docId = docInfo.getId();
 			double dotProduct = entry.getValue();
 			double denominator = docInfo.getLength()*queryVectorLength;
 			double score = dotProduct/denominator;
-			String snippet = "description";
-			result.add(new Document(score,docInfo.getUrl(),snippet));
+			String snippet = docInfo.getSnippet();
+			result.add(new Document(docId,score,docInfo.getUrl(),snippet));
 		}
 
 		// sort the result list
 		Collections.sort(result);
 		return result;
 	}
+
 	
 	public ArrayList<Document> generateUpdatedResults(String[] docIds, String[] relevance){
-		return null;
+
+		HashMap<String,Double> positiveFeedback = new HashMap<String,Double>();
+		HashMap<String,Double> negativeFeedback = new HashMap<String,Double>();
+		int numPositiveDoc = 0;
+		int numNegativeDoc = 0;
+				
+		for (int i=0; i<relevance.length; i++){
+			TermOccurrence docVec = index.docVectors.get(Integer.parseInt(docIds[i]));
+			if (relevance[i].equals("1")){
+				numPositiveDoc++;
+				for (Map.Entry<String, Double> termOcc: docVec.getTermOccMap().entrySet()){
+					String term = termOcc.getKey();
+					Double count = termOcc.getValue();
+					if (positiveFeedback.containsKey(term)){
+						positiveFeedback.put(term, positiveFeedback.get(term)+count);
+					} else {
+						positiveFeedback.put(term, count); 
+					}
+				}
+			} else {
+				numNegativeDoc++;
+				for (Map.Entry<String, Double> termOcc: docVec.getTermOccMap().entrySet()){
+					String term = termOcc.getKey();
+					Double count = termOcc.getValue();
+					if (negativeFeedback.containsKey(term)){
+						negativeFeedback.put(term, negativeFeedback.get(term)+count);
+					} else {
+						negativeFeedback.put(term, count); 
+					}
+				}
+			}
+		}
+		
+		
+		// Add beta and gamma values to positive and negative feedback vectors.
+		double beta = 0.5d;
+		for (Map.Entry<String,Double> entry: positiveFeedback.entrySet()){
+			positiveFeedback.put(entry.getKey(), entry.getValue()*(beta/numPositiveDoc));
+		}
+		
+		double gamma = 0.1d;
+		for (Map.Entry<String,Double> entry: negativeFeedback.entrySet()){
+			negativeFeedback.put(entry.getKey(), entry.getValue()*(gamma/numNegativeDoc));
+		}
+		
+		
+		
+		// add positive and negative feedback to the original query
+		for (Map.Entry<String, Double> entry: positiveFeedback.entrySet()){
+			String term = entry.getKey();
+			Double wt = entry.getValue();
+			if (queryIndex.containsKey(term)){
+				queryIndex.put(term, queryIndex.get(term)+wt);
+			} else {
+				queryIndex.put(term, wt);
+			}
+		}
+		
+		for (Map.Entry<String, Double> entry: negativeFeedback.entrySet()){
+			String term = entry.getKey();
+			Double wt = entry.getValue();
+			if (queryIndex.containsKey(term)){
+				double newWt = queryIndex.get(term)-wt;
+				if (newWt<0) newWt=0;
+				queryIndex.put(term, newWt);
+			} 
+//			else {
+//				queryIndex.put(term, wt);
+//			}
+		}
+		
+		return generateResults();
 	}
 }

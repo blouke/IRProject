@@ -23,13 +23,17 @@ import ir.indexer.TokenInfo;
 public class TermIndexer implements Serializable{
 
 	private static final long serialVersionUID = 1L;
-	public HashMap<Integer,DocInfo> docInfoList = new HashMap<Integer,DocInfo>();
-	public HashMap<String, TokenInfo> dictionary = new HashMap<String, TokenInfo>();
+	public HashMap<Integer, DocInfo> docInfoList;
+	public HashMap<String, TokenInfo> dictionary;
+	public HashMap<Integer, TermOccurrence> docVectors;
 	private int docId=0;
 	private transient InputStream inputStream;
 
 	public TermIndexer(InputStream inputStream){
 		this.inputStream = inputStream;
+		docInfoList = new HashMap<Integer, DocInfo>();
+		dictionary = new HashMap<String, TokenInfo>();
+		docVectors = new HashMap<Integer, TermOccurrence>();
 	}
 
 	public void initialize() {
@@ -46,8 +50,9 @@ public class TermIndexer implements Serializable{
 				url = tokenString[0];
 				content = tokenString[3];
 				content = content.trim();
+				String snippet = (content.length()>100 ? content.substring(0,100): content.substring(0));
 				if (content.length()>0){
-					docInfoList.put(docId, new DocInfo(docId,url));
+					docInfoList.put(docId, new DocInfo(docId,url,snippet));
 					createIndex(content, docId);
 					docId+=1;
 				}
@@ -104,6 +109,13 @@ public class TermIndexer implements Serializable{
 					TokenInfo newTokenInfo = new TokenInfo();
 					newTokenInfo.addTokenOccurrence(docId,1);
 					dictionary.put(term, newTokenInfo);
+				}
+				
+				// update DocVectors
+				if (docVectors.containsKey(docId)){
+					docVectors.get(docId).addTermOcc(term);
+				} else {
+					docVectors.put(docId, new TermOccurrence(term));
 				}
 			}
 			tokenStream.end();

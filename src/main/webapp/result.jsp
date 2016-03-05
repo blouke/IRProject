@@ -26,18 +26,21 @@
 	<form method="post" action="${pageContext.request.contextPath}/search" onsubmit="return validateForm();">
 	
 	<input type="text" id="query" name="query">
-	<button type="submit" id="submit" value="searchQuery">Search</button>
-	<button type="submit" id="submit" value="refineQuery">Submit Feedback</button>
+	<button type="submit" id="submit" name="searchQuery">Search</button>
+	<button type="submit" id="submit" name="refineQuery">Submit Feedback</button>
 	
 	<c:choose>
 		<c:when test="${fn:length(results)>0}">
 			<c:forEach var="document" items="${results}">
-				<h4><a href="<c:url value="http://${document.url}" />">${document.url}</a></h4>
-				<input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant
+			<table>
+				<tr><td><h4><a href="<c:url value="http://${document.url}" />">${document.url}</a></h4></td></tr>
+				<tr><td><c:out value="${document.snippet}" /></td></tr>
+				<tr><td><input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant</td></tr>
+				<tr><td><strong>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="3"/></strong></td></tr>
+				
 				<input type="hidden" id="relevanceHidden" name="relevanceHidden" value="0"/>
-				<h4>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="5"/></h4>
-				<c:out value="${document.snippet}" />
-				<input type="hidden" name="docId" value="document.docId"/>
+				<input type="hidden" name="docId" value="${document.docId}"/>
+				</table>
 			</c:forEach>
 		</c:when>
 		<c:otherwise>

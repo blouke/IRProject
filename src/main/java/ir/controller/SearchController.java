@@ -32,7 +32,7 @@ import ir.query.QueryProcessor;
 //@WebServlet("/search")
 public class SearchController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private TermIndexer index;
+	private static TermIndexer index;
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -103,18 +103,19 @@ public class SearchController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		ArrayList<Document> searchResults = null;
-		Map<String, String[]> feedbackData = request.getParameterMap();
+		Map<String, String[]> requestDataMap = request.getParameterMap();
 		QueryProcessor queryProcessor = new QueryProcessor(index);
 		queryProcessor.processQuery(request.getParameter("query"));
 		
-		if (feedbackData.containsKey("relevanceHidden")){
-			String[] docIds = feedbackData.get("docId");
-			String[] relevance = feedbackData.get("relevanceHidden");
+		if (requestDataMap.containsKey("refineQuery")){
+			String[] docIds = requestDataMap.get("docId");
+			String[] relevance = requestDataMap.get("relevanceHidden");
 			searchResults = queryProcessor.generateUpdatedResults(docIds, relevance);
 		}
 		else {
 			searchResults  = queryProcessor.generateResults();
 		}
+		
 		request.setAttribute("results", searchResults);
 		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/result.jsp");
 		dispatcher.include(request, response);
@@ -129,18 +130,3 @@ public class SearchController extends HttpServlet {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
