@@ -5,17 +5,24 @@
 
 <head>
 <meta charset="utf-8">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
 <title>IRProject</title>
 </head>
 
-<body>
-<!-- ${pageContext.request.contextPath} -->
-	<h1>Search</h1>
-	<form action="${pageContext.request.contextPath}/search" method="post" id="searchbox">
-		
-			<input type="text" id="query" name="query">
-			<button type="submit" id="submit">Search</button>
-	</form>
-
+<body class="homepage">
+	
+		<div class="container-1">
+			<h3 class="heading">DePaul CSC575 Project</h3>
+			<form action="${pageContext.request.contextPath}/search" method="post" id="searchbox">
+				
+				<span class="icon"><i class="fa fa-search"></i></span> 
+				<input type="search" id="search" name="query" placeholder="Search..."> 
+				<input type="submit" id="submit" value="Search">
+				
+			</form>
+		</div>
+	
+	
 </body>
 </html>
