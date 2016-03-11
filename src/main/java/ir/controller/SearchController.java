@@ -48,7 +48,7 @@ public class SearchController extends HttpServlet {
 		super.init(config);
 		ServletContext context = config.getServletContext();
 
-		InputStream fileIn = context.getResourceAsStream("/WEB-INF/classes/index.ser");
+		InputStream fileIn = context.getResourceAsStream("index.ser");
 
 		if (fileIn!=null){
 			try {
@@ -71,7 +71,7 @@ public class SearchController extends HttpServlet {
 			// serialize index
 			FileOutputStream fileOut;
 			try {
-				String indexFilePath = context.getRealPath("/WEB-INF/classes/");
+				String indexFilePath = context.getRealPath("/");
 				fileOut = new FileOutputStream(indexFilePath+"index.ser");
 				ObjectOutputStream out = new ObjectOutputStream(fileOut);
 				out.writeObject(index);

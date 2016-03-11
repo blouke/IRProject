@@ -12,8 +12,12 @@
 <link href="style.css" rel="stylesheet">
 <title>Insert title here</title>
 <script type="text/javascript">
-	function validateForm() {
+	function validateFeedback() {
 		var totalDoc = document.getElementsByName("docId").length;
+		if (totalDoc == 0){
+			document.getElementById("heading").innerHTML = "No documents to provide feedback on.";
+			return false;
+		}
 		for (var i=0; i<totalDoc; i++){
 			if (document.getElementsByName("relevance")[i].checked) {
 				document.getElementsByName("relevanceHidden")[i].value = "1";
@@ -21,39 +25,53 @@
 		}
 		document.getElementByName("relevance").disabled = true;
 	}
+	
+	function validateQuery(){
+		var queryLength = document.getElementById("search").value.length;
+		if (queryLength == 0 ){
+			document.getElementById("resultlist").innerHTML = "";
+			document.getElementById("heading").innerHTML = "Search query can't be empty.";
+			return false;
+		}
+	}
 </script>
 
 </head>
 <body>
 	<div class="container-2">
-		<form method="post" action="${pageContext.request.contextPath}/search" onsubmit="return validateForm();">
+		<form method="post" action="${pageContext.request.contextPath}/search">
 			
 			<span class="icon"><i class="fa fa-search"></i></span> 
 			<input type="search" id="search" name="query" placeholder="Search..."> 
-			<div><input type="submit" id="submit" value="Search" name="searchQuery"></div>
-			<input type="submit" id="submit" name="refineQuery" value="Submit Feedback">
+			<div><input type="submit" id="searchsubmit" value="Search" name="searchQuery" onclick="return validateQuery();"></div>
+			<input type="submit" id="feedbacksubmit" name="refineQuery" value="Submit Feedback" onclick="return validateFeedback();">
 			
-			<h3 class="heading"><c:out value="${fn:length(results)}"/> documents found.</h3>
-			
-			<c:choose>
-				<c:when test="${fn:length(results)>0}">
-					<c:forEach var="document" items="${results}">
-					<table>
-						<tr><td><h4><a href="<c:url value="http://${document.url}" />">${document.url}</a></h4></td></tr>
-						<tr><td><c:out value="${document.snippet}" /></td></tr>
-						<tr><td><input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant</td></tr>
-						<tr><td><strong>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="3"/></strong></td></tr>
-						
-						<input type="hidden" id="relevanceHidden" name="relevanceHidden" value="0"/>
-						<input type="hidden" name="docId" value="${document.docId}"/>
-						</table>
-					</c:forEach>
-				</c:when>
-				<c:otherwise>
-					<p>No relevant documents found.</p>
-				</c:otherwise>
-			</c:choose>
+			<div class="resultlist">
+				<h3 class="heading" id="heading"><c:out value="${fn:length(results)}"/> documents found.</h3>
+				
+				<div id="resultlist" class="resultlist">
+				<c:choose>
+					<c:when test="${fn:length(results)>0}">
+						<c:forEach var="document" items="${results}">
+						<table>
+							<tr><td><a href="<c:url value="http://${document.url}" />">${document.url}</a></td></tr>
+							<tr><td id="description"><c:out value="${document.snippet}" /></td></tr>
+							<tr><td><input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant
+								<span id="score"><strong>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="3"/></strong></span></td></tr>
+							
+							<input type="hidden" id="relevanceHidden" name="relevanceHidden" value="0"/>
+							<input type="hidden" name="docId" value="${document.docId}"/>
+							</table>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<span>No relevant documents found.</span>
+					</c:otherwise>
+				</c:choose>
+				</div>
+			</div>
 		</form>
 	</div>
+	<div style="clear:both; position:absolute; bottom:-20px;"></div>
 </body>
 </html>

@@ -1,5 +1,16 @@
 /*   For index.jsp   */
 
+/*
+* {
+   border: 1px solid red !important;
+}
+*/
+
+body {
+	padding-bottom: 100px;
+}
+
+
 body.resultpage {
 	background: white;
 	height: 100%;
@@ -8,7 +19,7 @@ body.resultpage {
 
 
 .container-1 {
-	width: 300px;
+	width: 400px;
 	vertical-align: middle;
 	white-space: nowrap;
 	position: absolute;
@@ -16,20 +27,24 @@ body.resultpage {
 	left: 50%;
 	transform: translate(-50%, -50%);
 	margin: auto;
+	padding: 1px;
 }
 
 .container-1 input#search {
-	width: 300px;
+	display: block;
+	position: relative;
+	margin: auto;
+	width: 350px;
 	height: 40px;
 	background: #ffffff;
 	border: 2px solid #dadada;
     border-radius: 7px;
 	font-size: 12pt;
-	float: left;
 	color: #63717f;
 	padding-left: 45px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
+	box-sizing: border-box;
 }
 
 .container-1 input#search:focus { 
@@ -41,14 +56,17 @@ body.resultpage {
 .container-1 .icon {
 	position: absolute;
 	top: 40%;
-	margin-left: 17px;
-	margin-top: 17px;
+	margin-left: 40px;
+	margin-top: 20px;
 	z-index: 1;
 	color: #4f5b66;
 }
 
-.container-1 input[type="submit"], input[type="submit"]:hover {
+.container-1 input[type="submit"] {
+	display: block;
+	margin: auto;
 	position: relative;
+	top: 20px;
 	left: -6px;
 	width: 10em;
 	height: 2em; border : 1px solid #adc5cf;
@@ -71,15 +89,11 @@ body.resultpage {
 	border: 1px solid #adc5cf;
 }
 
-.container-1 #submit {
-	display: block;
-	margin: auto;
-	position: relative;
-	top: 20px;
-}
 
-h3.heading {
+.container-1 h3.heading {
 	font-family: Arial, Helvetica, sans-serif;
+	position: relative;
+	left: 80px;
 }
 
 
@@ -100,18 +114,16 @@ body.homepage {
 }
 
 .container-2 {
-	width: 100%;
+	width: 80%;
 	vertical-align: middle;
 	white-space: nowrap;
 	position: absolute;
 	top: 5%;
 	left: 5%;
-	bottom: 5%;
-	margin: auto;
 }
 
 .container-2 input#search {
-	width: 300px;
+	width: 350px;
 	height: 40px;
 	background: #ffffff;
 	border: 2px solid #dadada;
@@ -122,6 +134,7 @@ body.homepage {
 	padding-left: 45px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
+	box-sizing: border-box;
 }
 
 
@@ -141,10 +154,10 @@ body.homepage {
 	color: #4f5b66;
 }
 
-.container-2 input[type="submit"], input[type="submit"]:hover {
+.container-2 input[id="searchsubmit"] {
 	display: block;
-	position: relative;
-	left: 5px;
+	position: absolute;
+	top: 60px;
 	width: 10em;
 	height: 2em; border : 1px solid #adc5cf;
 	background: #e4f1f9; /* Old browsers */
@@ -165,3 +178,57 @@ body.homepage {
 	cursor: pointer;
 	border: 1px solid #adc5cf;
 }
+
+
+.container-2 input[id="feedbacksubmit"] {
+	display: block;
+	position: absolute;
+	top: 60px;
+	left: 215px;
+	width: 10em;
+	height: 2em; border : 1px solid #adc5cf;
+	background: #e4f1f9; /* Old browsers */
+	background: -moz-linear-gradient(top, #e4f1f9 0%, #d5e7f3 100%);
+	/* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e4f1f9),
+		color-stop(100%, #d5e7f3)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #e4f1f9 0%, #d5e7f3 100%);
+	/* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #e4f1f9 0%, #d5e7f3 100%);
+	/* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #e4f1f9 0%, #d5e7f3 100%);
+	/* IE10+ */
+	background: linear-gradient(top, #e4f1f9 0%, #d5e7f3 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e4f1f9',
+		endColorstr='#d5e7f3', GradientType=0); /* IE6-9 */
+	color: #7da2aa;
+	cursor: pointer;
+	border: 1px solid #adc5cf;
+}
+
+
+.container-2 .resultlist {
+	display:block;
+	position: absolute;
+	width: 80%;
+	top: 100px;
+}
+
+
+a {
+	display: block;
+	padding-top: 25px;
+	padding-bottom: 0px;
+	font-size: 16pt;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.resultlist #description {
+	font-size: 13pt;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.resultlist #score {
+	padding-left: 60px;
+}
+

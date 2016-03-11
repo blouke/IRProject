@@ -17,7 +17,7 @@
 			<form action="${pageContext.request.contextPath}/search" method="post" id="searchbox">
 				
 				<span class="icon"><i class="fa fa-search"></i></span> 
-				<input type="search" id="search" name="query" placeholder="Search..."> 
+				<input type="search" id="search" name="query" placeholder="Search..." required> 
 				<input type="submit" id="submit" value="Search">
 				
 			</form>
