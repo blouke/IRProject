@@ -73,10 +73,9 @@ public class SearchController extends HttpServlet {
 			index.initialize();
 
 			// serialize index
-			FileOutputStream fileOut;
+			FileOutputStream fileOut; 
 			try {
-				URL indexURL = context.getResource("");
-				String indexFilePath = indexURL.toString()+"index.ser"; 
+				String indexFilePath = context.getRealPath("/")+"index.ser"; 
 				fileOut = new FileOutputStream(indexFilePath);
 				ObjectOutputStream out = new ObjectOutputStream(fileOut);
 				out.writeObject(index);
@@ -84,8 +83,8 @@ public class SearchController extends HttpServlet {
 				fileOut.close();
 				
 				// these two lines needed to make sure that file is persisted before reading it later.
-				fileOut = new FileOutputStream(indexFilePath);
-				fileOut.close();
+//				fileOut = new FileOutputStream(indexFilePath);
+//				fileOut.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			} catch (IOException e) {
@@ -99,9 +98,10 @@ public class SearchController extends HttpServlet {
 		Map<String,Object> fileAttributes = new HashMap<String,Object>();
 		
 			try {
-				Path indexPath = Paths.get(context.getResource("index.ser").toURI());
+				String indexFilePath = context.getRealPath("/")+"index.ser"; 
+				Path indexPath = Paths.get(indexFilePath);
 				fileAttributes = Files.readAttributes(indexPath, "size,creationTime");
-			} catch (IOException | URISyntaxException e2) {
+			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
 		indexSize = ((Long)fileAttributes.get("size"))/1024;

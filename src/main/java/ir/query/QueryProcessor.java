@@ -129,7 +129,7 @@ public class QueryProcessor {
 
 					if (searchResult.containsKey(docInfo)){
 						double score = searchResult.get(docInfo);
-						double newScore = score + (queryIndex.get(token)*(tokenCount*idf));
+						double newScore = score + (queryIndex.get(token)*(tokenCount*idf));	// incrementing dot-product
 						searchResult.put(docInfo, newScore);
 					} else {
 						searchResult.put(docInfo, queryIndex.get(token)*tokenCount*idf);
@@ -150,7 +150,7 @@ public class QueryProcessor {
 			DocInfo docInfo = entry.getKey();
 			int docId = docInfo.getId();
 			double dotProduct = entry.getValue();
-			double denominator = docInfo.getLength()*queryVectorLength;
+			double denominator = Math.sqrt(docInfo.getLength())*queryVectorLength;
 			double score = dotProduct/denominator;
 			String snippet = docInfo.getSnippet();
 			result.add(new Document(docId,score,docInfo.getUrl(),snippet));
