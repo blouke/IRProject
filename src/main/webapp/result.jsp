@@ -50,24 +50,24 @@
 				<h3 class="heading" id="heading"><c:out value="${fn:length(results)}"/> documents found.</h3>
 				
 				<div id="resultlist" class="resultlist">
-				<c:choose>
-					<c:when test="${fn:length(results)>0}">
-						<c:forEach var="document" items="${results}">
-						<table>
-							<tr><td><a href="<c:url value="http://${document.url}" />">${document.url}</a></td></tr>
-							<tr><td id="description"><c:out value="${document.snippet}" /></td></tr>
-							<tr><td><input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant
-								<span id="score"><strong>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="3"/></strong></span></td></tr>
-							
-							<input type="hidden" id="relevanceHidden" name="relevanceHidden" value="0"/>
-							<input type="hidden" name="docId" value="${document.docId}"/>
-							</table>
-						</c:forEach>
-					</c:when>
-					<c:otherwise>
-						<span>No relevant documents found.</span>
-					</c:otherwise>
-				</c:choose>
+					<table class="tablestyle">
+						<c:choose>
+							<c:when test="${fn:length(results)>0}">
+								<c:forEach var="document" items="${results}">
+									<tr><td><a href="<c:url value="http://${document.url}" />">${document.url}</a></td></tr>
+									<tr><td id="description"><c:out value="${document.snippet}" /></td></tr>
+									<tr><td><input type="checkbox" id="relevance" name="relevance" value="1"/>Relevant
+									<span id="score"><strong>Score :<fmt:formatNumber value="${document.score}" type="number" maxFractionDigits="3"/></strong></span></td></tr>
+									<input type="hidden" id="relevanceHidden" name="relevanceHidden" value="0"/>
+									<input type="hidden" name="docId" value="${document.docId}"/>
+									<tr><td  class="tablepadding"></td></tr>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<span>No relevant documents found.</span>
+							</c:otherwise>
+						</c:choose>
+					</table>
 				</div>
 			</div>
 		</form>

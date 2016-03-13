@@ -21,8 +21,9 @@
 				<input type="submit" id="submit" value="Search">
 				
 			</form>
+			
 		</div>
-	
+		<div class="footer">Index created on ${indexCreationTime} with a total size of ${indexSize}KB</div>
 	
 </body>
 </html>

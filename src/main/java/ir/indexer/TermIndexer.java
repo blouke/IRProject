@@ -48,9 +48,10 @@ public class TermIndexer implements Serializable{
 			while (tokenStream.incrementToken()){
 				tokenString = token.toString().split("\\R",4);
 				url = tokenString[0];
+				url = url.replace("http://", "");
 				content = tokenString[3];
 				content = content.trim();
-				String snippet = (content.length()>100 ? content.substring(0,100): content.substring(0));
+				String snippet = (content.length()>100 ? content.substring(0,100)+"...": content.substring(0));
 				if (content.length()>0){
 					docInfoList.put(docId, new DocInfo(docId,url,snippet));
 					createIndex(content, docId);
