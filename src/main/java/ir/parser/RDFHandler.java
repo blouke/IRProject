@@ -49,7 +49,11 @@ class RDFHandler extends DefaultHandler{
 		String value = new String(ch, start, length).trim();
 		if (value.length()==0) return;
 		
-		if ("topic".equals(elementStack.peek()) && value.startsWith("Top/Shopping/Clothing/Casual")){
+		if ("topic".equals(elementStack.peek()) && (value.startsWith("Top/Shopping/Clothing/Casual") 
+				|| value.startsWith("Top/Shopping/Sports/Apparel")
+				|| value.startsWith("Top/Shopping/Clothing/Men's")
+				|| value.startsWith("Top/Shopping/Clothing/Women's")
+				|| value.startsWith("Top/Shopping/Clothing/Footwear"))){
 			try {
 				if (!link.isEmpty()) {
 					fileWriter.write(link+"\n");
